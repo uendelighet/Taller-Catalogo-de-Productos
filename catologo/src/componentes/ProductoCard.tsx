@@ -1,56 +1,52 @@
+// src/components/ProductCard.tsx
 import { useState } from "react";
 import { Producto } from "../types";
 
-interface ProductoCardProps {
+type Props = {
   producto: Producto;
-}
+};
 
-export default function ProductoCard({ producto }: ProductoCardProps) {
-  const [agregado, setAgregado] = useState(false);
-  const [mostrarReseñas, setMostrarReseñas] = useState(false);
+function ProductCard({ producto }: Props) {
+  // estados para el boton de carrito y reseñas
+  const [enCarrito, setEnCarrito] = useState(false);
+  const [verResenas, setVerResenas] = useState(false);
 
   return (
-    <div className="border rounded-2xl shadow-md p-4 w-64 bg-white">
-      <img
-        src={producto.imagen}
-        alt={producto.nombre}
-        className="w-full h-40 object-cover rounded-xl mb-2"
-      />
-      <h2 className="text-xl font-bold">{producto.nombre}</h2>
-      <p className="text-gray-600">{producto.descripcion}</p>
-      <p className="font-semibold mt-2">${producto.precio.toFixed(2)}</p>
+    <div className="tarjeta">
+      <img src={producto.imagen} alt={producto.nombre} className="img" />
 
-      <button
-        onClick={() => setAgregado(true)}
-        disabled={agregado}
-        className={`mt-3 px-3 py-1 rounded-lg w-full ${
-          agregado ? "bg-green-500 text-white" : "bg-blue-500 text-white"
-        }`}
-      >
-        {agregado ? "Agregado ✅" : "Agregar al Carrito"}
-      </button>
+      <h3>{producto.nombre}</h3>
+      <p>{producto.descripcion}</p>
+      <p><b>Precio:</b> ${producto.precio}</p>
 
-      <button
-        onClick={() => setMostrarReseñas(!mostrarReseñas)}
-        className="mt-2 text-sm text-blue-600 underline"
-      >
-        {mostrarReseñas ? "Ocultar Reseñas" : "Mostrar Reseñas"}
-      </button>
+      <div style={{ marginTop: "10px" }}>
+        <button
+          onClick={() => setEnCarrito(true)}
+          disabled={enCarrito}
+        >
+          {enCarrito ? "Agregado ✅" : "Agregar al Carrito"}
+        </button>
 
-      {mostrarReseñas && (
-        <ul className="mt-2 bg-gray-50 p-2 rounded-xl text-sm">
-          {producto.reseñas.length > 0 ? (
-            producto.reseñas.map((r, i) => (
-              <li key={i} className="mb-1">
-                <strong>{r.usuario}:</strong> {r.texto} <br />
-                <span className="text-gray-500 text-xs">{r.fecha}</span>
+        <button onClick={() => setVerResenas(!verResenas)}>
+          {verResenas ? "Ocultar Reseñas" : "Mostrar Reseñas"}
+        </button>
+      </div>
+
+      {verResenas && (
+        <ul>
+          {producto.reseñas.length === 0 ? (
+            <li>No hay reseñas</li>
+          ) : (
+            producto.reseñas.map((r, index) => (
+              <li key={index}>
+                <b>{r.usuario}</b>: {r.texto} ({r.fecha})
               </li>
             ))
-          ) : (
-            <li className="text-gray-500 italic">Sin reseñas aún</li>
           )}
         </ul>
       )}
     </div>
   );
 }
+
+export default ProductCard;

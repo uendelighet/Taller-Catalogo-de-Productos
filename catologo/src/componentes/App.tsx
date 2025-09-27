@@ -1,18 +1,21 @@
+
 import productos from "./data/productos.json";
-import ProductoCard from "./components/ProductoCard";
+import ProductCard from "./components/ProductCard";
 import { Producto } from "./types";
 
-export default function App() {
+function App() {
+  const listaProductos =  productos as Producto[];
+
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-center mb-6">
-        Catálogo de Productos
-      </h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {productos.map((p: Producto) => (
-          <ProductoCard key={p.id} producto={p} />
-        ))}
+    <div style={{ padding: "20px" }}>
+      <h1>Catálogo de Productos</h1>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
+        {listaProductos.map((p) => (
+          <ProductCard key={p.id} producto={p} />
+          ))}
       </div>
     </div>
   );
 }
+
+export default App;
