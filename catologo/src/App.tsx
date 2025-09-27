@@ -1,4 +1,11 @@
 import { useEffect, useState } from "react";
+import TarjetaProducto from "./components/TarjetaProducto";
+
+interface Reseña {
+  usuario: string;
+  texto: string;
+  fecha: string;
+}
 
 interface Producto {
   id: number;
@@ -6,6 +13,7 @@ interface Producto {
   descripcion: string;
   precio: number;
   imagen: string;
+  reseñas: Reseña[];
 }
 
 export default function App() {
@@ -25,6 +33,7 @@ export default function App() {
   return (
     <div style={{ maxWidth: 1000, margin: "0 auto", padding: 20 }}>
       <h1 style={{ textAlign: "center" }}>Catálogo de Productos</h1>
+
       <div
         style={{
           display: "grid",
@@ -34,26 +43,14 @@ export default function App() {
         }}
       >
         {productos.map((p) => (
-          <div
+          <TarjetaProducto
             key={p.id}
-            style={{
-              background: "white",
-              border: "1px solid #ddd",
-              borderRadius: 12,
-              padding: 16,
-              textAlign: "center",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-            }}
-          >
-            <img
-              src={p.imagen}
-              alt={p.nombre}
-              style={{ width: "100%", borderRadius: 8 }}
-            />
-            <h2 style={{ marginTop: 10 }}>{p.nombre}</h2>
-            <p style={{ color: "#555" }}>{p.descripcion}</p>
-            <strong>${p.precio}</strong>
-          </div>
+            nombre={p.nombre}
+            descripcion={p.descripcion}
+            precio={p.precio}
+            imagen={p.imagen}
+            reseñas={p.reseñas}
+          />
         ))}
       </div>
     </div>
