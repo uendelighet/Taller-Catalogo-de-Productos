@@ -1,0 +1,82 @@
+import { useState, useEffect } from 'react';
+import { ProductoCompleto, EstadoCarga } from '../types';
+
+/**
+ * Custom hook que maneja la obtención de productos desde el archivo JSON
+ * Utiliza fetch para cargar los datos y maneja estados de carga y error
+ * 
+ * @returns {Object} Objeto con productos, estado de carga y errores
+ */
+export const useObtenerProductos = () => {
+  // Estado para almacenar la lista de productos
+  const [listaProductos, setListaProductos] = useState<ProductoCompleto[]>([]);
+  
+  // Estado para manejar la carga y errores
+  const [estadoCarga, setEstadoCarga] = useState<EstadoCarga>({
+    cargando: true,
+    error: null
+  });
+
+  /**
+   * Función asíncrona que obtiene los productos del archivo JSON
+   * Maneja errores de red y parsing de JSON
+   */
+  const obtenerProductosDesdeJSON = async (): Promise<void> => {
+    try {
+      // Resetear estado al comenzar la carga
+      setEstadoCarga({ cargando: true, error: null });
+      
+      // Realizar petición fetch al archivo JSON en la carpeta public
+      const respuestaHTTP = await fetch('/data/productos.json');
+      
+      // Verificar si la respuesta es exitosa
+      if (!respuestaHTTP.ok) {
+        throw new Error(`Error HTTP: ${respuestaHTTP.status} - ${respuestaHTTP.statusText}`);
+      }
+      
+      // Convertir la respuesta a JSON
+      const datosProductos: ProductoCompleto[] = await respuestaHTTP.json();
+      
+      // Validar que los datos sean un array
+      if (!Array.isArray(datosProductos)) {
+        throw new Error('Los datos recibidos no tienen el formato esperado (array)');
+      }
+      
+      // Actualizar el estado con los productos obtenidos
+      setListaProductos(datosProductos);
+      setEstadoCarga({ cargando: false, error: null });
+      
+      console.log(`✅ Productos cargados exitosamente: ${datosProductos.length} productos`);
+      
+    } catch (errorCapturado) {
+      // Manejar cualquier error durante la carga
+      const mensajeError = errorCapturado instanceof Error 
+        ? errorCapturado.message 
+        : 'Error desconocido al cargar productos';
+      
+      console.error('❌ Error al cargar productos:', mensajeError);
+      
+      setEstadoCarga({ 
+        cargando: false, 
+        error: `No se pudieron cargar los productos: ${mensajeError}` 
+      });
+    }
+  };
+
+  /**
+   * Effect hook que se ejecuta al montar el componente
+   * Llama a la función para obtener productos
+   */
+  useEffect(() => {
+    obtenerProductosDesdeJSON();
+  }, []);
+
+  // Retornar los datos y estados para usar en componentes
+  return {
+    productos: listaProductos,
+    cargando: estadoCarga.cargando,
+    error: estadoCarga.error,
+    // Función para recargar productos (útil para reintentos)
+    recargarProductos: obtenerProductosDesdeJSON
+  };
+};
